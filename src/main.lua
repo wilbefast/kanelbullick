@@ -130,6 +130,15 @@ function love.keyreleased(key, uni)
 end
 
 function love.mousepressed(x, y, button)
+  if tongue_down then
+    tongue_down = false
+    tongue_up = true
+    GameState.onWheelDown()
+  else
+    tongue_down = true
+    tongue_up = false
+    GameState.onWheelUp()
+  end
 end
 
 function love.mousereleased(x, y, button)

@@ -78,6 +78,7 @@ function state:enter()
   body:setUserData("eastWall")
   -- bun
   self.bun = Bun(WORLD_W*0.5, -WORLD_H*0.5)
+  self.lick = 0
 end
 
 function state:leave()
@@ -98,11 +99,15 @@ end
 function state:onWheelDown()
   local dx, dy = mx - WORLD_W/2, my - WORLD_H
   --self.bun.body:applyLinearImpulse(-dx*10, -dy*10)
+
+  self.lick = 0.1
 end
 
 function state:onWheelUp()
   local dx, dy = mx - WORLD_W/2, my - WORLD_H
   --self.bun.body:applyLinearImpulse(dx*10, dy*10)
+
+  self.lick = 0.1
 end
 
 function state:update(dt)
@@ -111,6 +116,12 @@ function state:update(dt)
 
   -- update logic
   GameObject.updateAll(dt)
+
+  -- lick
+  if self.lick > 0 then
+    self.lick = self.lick - dt
+    self.bun:lick(mx - self.bun.x, my - self.bun.y, dt)
+  end
 end
 
 function state:draw()
