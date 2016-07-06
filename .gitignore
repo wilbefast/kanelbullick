@@ -1,0 +1,4 @@
+*.orig
+*.lnk
+build
+src/assets/fudge
