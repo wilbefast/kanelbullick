@@ -108,6 +108,17 @@ function state:onWheelUp()
   --self.bun.body:applyLinearImpulse(dx*10, dy*10)
 
   self.lick = 0.1
+  for r = 0,6 do
+    local a = (r/6)*math.pi*2
+    local dx = math.cos(r)
+    local dy = math.sin(r)
+
+    local nm_angle_x, nm_angle_y = Vector.normalise(m_angle_x, m_angle_y)
+
+    dx = useful.lerp(dx, nm_angle_x, 0.5)*(100 + math.random()*30)
+    dy = useful.lerp(dy, nm_angle_y, 0.5)*(100 + math.random()*30)
+    Spittle(mx, my, dx, dy)
+  end
 end
 
 function state:update(dt)
@@ -127,12 +138,21 @@ end
 function state:draw()
 	GameObject.drawAll()
 
+  -- spittle
+  useful.bindWhite(128)
+    love.graphics.draw(SPITTLE_CANVAS, 0, 0)
+  useful.bindWhite()
+  useful.pushCanvas(SPITTLE_CANVAS)
+    love.graphics.clear()
+    love.graphics.setBlendMode("alpha")
+  useful.popCanvas()
+
   -- tongue
-  love.graphics.draw(img_tongue, mx, my, m_angle, 1, 1, 100, -100)
+  love.graphics.draw(img_tongue, mx, my, m_angle, 1, 1, 100, -75)
   if tongue_up then
-    love.graphics.draw(img_tongue_up, mx, my, m_angle, 1, 1, 100, 0)
+    love.graphics.draw(img_tongue_up, mx, my, m_angle, 1, 1, 100, 25)
   elseif tongue_down then
-    love.graphics.draw(img_tongue_down, mx, my, m_angle, 1, 1, 100, 0)
+    love.graphics.draw(img_tongue_down, mx, my, m_angle, 1, 1, 100, 25)
   end
 
   if DEBUG then

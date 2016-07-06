@@ -68,11 +68,11 @@ function state:draw()
   useful.bindWhite()
 
   -- tongue
-  love.graphics.draw(img_tongue, mx, my, m_angle, 1, 1, 100, -100)
+  love.graphics.draw(img_tongue, mx, my, m_angle, 1, 1, 100, -75)
   if tongue_up then
-    love.graphics.draw(img_tongue_up, mx, my, m_angle, 1, 1, 100, 0)
+    love.graphics.draw(img_tongue_up, mx, my, m_angle, 1, 1, 100, 25)
   elseif tongue_down then
-    love.graphics.draw(img_tongue_down, mx, my, m_angle, 1, 1, 100, 0)
+    love.graphics.draw(img_tongue_down, mx, my, m_angle, 1, 1, 100, 25)
   end
 end
 

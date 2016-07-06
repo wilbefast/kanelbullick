@@ -53,6 +53,7 @@ function love.load(arg)
   -- game-specific code
   debugWorldDraw = require("debugWorldDraw")
   scaling = require("scaling")
+  Spittle = require("gameobjects/Spittle")
   Bun = require("gameobjects/Bun")
   ingame = require("gamestates/ingame")
   title = require("gamestates/title")
@@ -97,6 +98,7 @@ function love.load(arg)
 
   -- canvases
   WORLD_CANVAS = love.graphics.newCanvas(WORLD_W, WORLD_H)
+  SPITTLE_CANVAS = love.graphics.newCanvas(WORLD_W, WORLD_H)
 
   -- clear colour
   love.graphics.setBackgroundColor(0, 0, 0)
