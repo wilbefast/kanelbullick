@@ -125,7 +125,9 @@ function state:draw()
     my = my + WORLD_H*t
   end
   love.graphics.draw(img_tongue, mx, my, m_angle, 1, 1, 100, -75)
-  if tongue_up then
+  if tongue_t > 0 then
+    love.graphics.draw(img_tongue_end, mx, my, m_angle, 1, 1, 100, 25)
+  elseif tongue_up then
     love.graphics.draw(img_tongue_up, mx, my, m_angle, 1, 1, 100, 25)
   elseif tongue_down then
     love.graphics.draw(img_tongue_down, mx, my, m_angle, 1, 1, 100, 25)

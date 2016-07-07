@@ -27,6 +27,7 @@ WORLD_OX, WORLD_OY = WORLD_W/2, WORLD_H
 mx, my = WORLD_OX, WORLD_OY
 m_angle_x, m_angle_y = 0, 0
 m_angle = 0
+tongue_t = 0
 
 --[[------------------------------------------------------------
 LOCAL VARIABLES
@@ -85,6 +86,7 @@ function love.load(arg)
   img_tongue = love.graphics.newImage("assets/png/tongue.png")
   img_tongue_up = love.graphics.newImage("assets/png/tongue_up.png")
   img_tongue_down = love.graphics.newImage("assets/png/tongue_down.png")
+  img_tongue_end = love.graphics.newImage("assets/png/tongue_end.png")
   img_helmut = love.graphics.newImage("assets/png/helmut.png")
 
   -- initialise random
@@ -174,6 +176,7 @@ function love.wheelmoved(x, y)
       GameState.onWheelDown()
       shake = math.min(3, shake + 0.4)
       audio:play_sound("lick")
+      tongue_t = 0.1
     end 
   elseif y > 0 then
     if tongue_up then
@@ -182,6 +185,7 @@ function love.wheelmoved(x, y)
       GameState.onWheelUp()
       shake = math.min(3, shake + 0.4)
       audio:play_sound("lick")
+      tongue_t = 0.1
     end
   end
 end
@@ -194,6 +198,8 @@ function love.update(dt)
   if shake < 0 then
     shake = 0
   end
+
+  tongue_t = math.max(0, tongue_t - dt)
 
   mx, my = scaling.scaleMouse()
   mx, my = useful.clamp(mx, 1, WORLD_W - 1), useful.clamp(my, 1, WORLD_H - 6*math.sqrt(math.abs(mx - WORLD_OX)))
