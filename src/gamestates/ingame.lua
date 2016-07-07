@@ -75,8 +75,14 @@ function state:enter()
   
   self.lick = 0
 
+  self.firstBlood = false
+  self.tutorial = true
   self.score = 0
+  self.time_left = 1
   self.goToTitle = false
+  self.ui_t = 0
+
+  self.bun = Bun()
 end
 
 function state:leave()
@@ -90,17 +96,15 @@ Callbacks
 
 function state:keypressed(key, uni)
   if key == "escape" then
-    if not self.bun.entering then
-    	self.goToTitle = true
-      self.bun:startDroppingOut()
-    end
+    self.goToTitle = true
   end
 end
 
 function state:doLick(dir)
-  if self.bun.leaving then
+  if self.goToTitle or self.bun.leaving then
     return
   elseif self.bun:isTouched(mx, my) then
+    self.firstBlood = true
     shake = math.min(3, shake + 0.6)
     local dx, dy = mx - WORLD_W/2, my - WORLD_H
     self.bun.body:applyLinearImpulse(dir*dx*17, dir*dy*17)
@@ -145,6 +149,7 @@ function state:update(dt)
     if self.bun:amountCleaned() >= 1 then
       self.bun:startDroppingOut()
       self.score = self.score + 1
+      self.firstBlood = false
     end
   end
 
@@ -154,8 +159,30 @@ function state:update(dt)
       GameState.switch(title)
     else
       self.bun = Bun()
+      self.tutorial = false
+    end
+  else
+    -- drop bun if desired or time is up
+    if self.goToTitle and not self.bun.entering and not self.bun.leaving then
+      self.bun:startDroppingOut()
     end
   end
+
+  -- update ui
+  if self:showUI() then
+    self.ui_t = math.min(1, self.ui_t + dt)
+  else
+    self.ui_t = math.max(0, self.ui_t - dt)
+  end
+
+  -- update time limit
+  if self.ui_t >= 1 and self.firstBlood then
+    self.time_left = math.max(0, self.time_left - dt/60)
+  end
+end
+
+function state:showUI()
+  return self.bun and not self.bun.leaving and not self.bun.entering
 end
 
 function state:draw()
@@ -171,6 +198,11 @@ function state:draw()
   useful.popCanvas()
 
   -- tongue
+  local mx, my = mx, my
+  if self.leaving or self.entering then
+    local t = math.max(0, 1 - title.t)
+    my = my + WORLD_H*t
+  end
   love.graphics.draw(img_tongue, mx, my, m_angle, 1, 1, 100, -75)
   if tongue_up then
     love.graphics.draw(img_tongue_up, mx, my, m_angle, 1, 1, 100, 25)
@@ -179,11 +211,29 @@ function state:draw()
   end
 
   -- ui
-  if not self.bun.leaving and not self.bun.entering then
-    love.graphics.setColor(49, 29, 33)
+  if self.bun then
+    -- cinnameter
+    love.graphics.setColor(110, 72, 75)
     local max_h = WORLD_H - 32
     local h = max_h*(1 - self.bun:amountCleaned())
-    love.graphics.rectangle("fill", 16, 16+(max_h-h), 32, h)
+    love.graphics.rectangle("fill", 16 - 48*(1 - self.ui_t), 16+(max_h-h), 32, h)
+    love.graphics.setColor(49, 29, 33)
+    love.graphics.rectangle("line", 16 - 48*(1 - self.ui_t), 16, 32, max_h)
+    if self.tutorial then
+      love.graphics.setColor(110, 72, 75)
+      love.graphics.printf("Kanelmeter", 64, 48*self.ui_t - 32, WORLD_W*0.4, "left")
+    end
+    -- timer
+    love.graphics.setColor(145, 183, 180)
+    local max_h = WORLD_H - 32
+    local h = max_h*self.time_left
+    love.graphics.rectangle("fill", WORLD_W - 48*self.ui_t, 16+(max_h-h), 32, h)
+    love.graphics.setColor(49, 29, 33)
+    love.graphics.rectangle("line", WORLD_W - 48*self.ui_t, 16, 32, max_h)
+    if self.tutorial then
+      love.graphics.setColor(145, 183, 180)
+      love.graphics.printf("Slickatimer", WORLD_W - 64 - WORLD_W*0.4, 48*self.ui_t - 32, WORLD_W*0.4, "right")
+    end
     useful.bindWhite()
   end
 

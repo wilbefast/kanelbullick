@@ -16,7 +16,7 @@ Lesser General Public License for more details.
 GLOBAL VARIABLES
 --]]------------------------------------------------------------
 
-TITLE = "Kanelbullick"
+TITLE = "Kanelbullicka"
 WORLD_W, WORLD_H = 640, 640
 shake = 0
 COLLIDE_WALLS = 1
@@ -104,6 +104,9 @@ function love.load(arg)
 
   -- clear colour
   love.graphics.setBackgroundColor(0, 0, 0)
+
+  -- line width
+  love.graphics.setLineWidth(3)
 
   -- play music
   audio:load_music("na_sweden")

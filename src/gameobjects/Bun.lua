@@ -33,6 +33,7 @@ local Bun = Class
 		self.body = love.physics.newBody(ingame.world, x, y, "dynamic")
 		self.body:setUserData({ bun = self })
 		self.body:setFixedRotation(false)
+		self.body:setAngle(math.pi*2*math.random())
 		self.r = HSIZE
 		self.shape = love.physics.newCircleShape(self.r) 
 	  self.fixture = love.physics.newFixture(self.body, self.shape, 0.5)
@@ -84,8 +85,14 @@ function Bun:onPurge()
 end
 
 function Bun:endDroppingIn()
+	if not self.entering then
+		return
+	end
+
 	self.fixture:setMask(16)
-  self.body:setLinearVelocity(0, 0)
+	if not ingame.goToTitle then
+  	self.body:setLinearVelocity(0, 0)
+  end
   self.entering = false
 
   babysitter.add(coroutine.create(function(dt)
@@ -100,7 +107,13 @@ function Bun:endDroppingIn()
 end
 
 function Bun:startDroppingOut()
-  self.body:setLinearVelocity(0, 0)
+	if self.entering or self.leaving then
+		return
+	end
+
+	if not ingame.goToTitle then
+  	self.body:setLinearVelocity(0, 0)
+  end
   self.fixture:setMask(COLLIDE_FLOORS)
   self.leaving = true
 
@@ -151,7 +164,7 @@ function Bun:update(dt)
 
 	-- drop in
   if self.entering then
-    self.body:applyLinearImpulse(0, dt*1000)
+    self.body:applyLinearImpulse(0, dt*4000)
 		if self.y > WORLD_H*0.5 then
 			self:endDroppingIn()
 		end
@@ -159,7 +172,7 @@ function Bun:update(dt)
 
 	-- drop out
   if self.leaving then
-    self.body:applyLinearImpulse(0, dt*1000)
+    self.body:applyLinearImpulse(0, dt*4000)
 		if self.y > WORLD_H + SIZE + 8 then
 			self.purge = true
 		end

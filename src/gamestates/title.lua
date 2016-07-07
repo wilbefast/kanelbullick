@@ -31,6 +31,7 @@ function state:enter()
   if not self.entering then
     audio:set_music_volume(1)
   end
+  self.toGame = false
 end
 
 function state:leave()
@@ -49,8 +50,8 @@ function state:keypressed(key, uni)
 end
 
 function state:enterGame()
-  if not self.leaving and not self.entering then  
-    GameState.switch(ingame)
+  if not self.leaving and not self.entering then
+    self.toGame = true
   end
 end
 
@@ -69,6 +70,11 @@ function state:update(dt)
     if self.t <= -0.5 then
       love.event.push("quit")
     end
+  elseif self.toGame then
+    self.t = self.t - dt
+    if self.t <= 0 then
+      GameState.switch(ingame)
+    end
   else
     self.t = math.min(1, self.t + dt)
     if self.entering then
@@ -82,11 +88,11 @@ end
 
 function state:draw()
 	-- text
-	useful.bindBlack()
+	love.graphics.setColor(49, 29, 33)
 	love.graphics.setFont(fontLarge)
   if self.t < 1 then
     love.graphics.printf("Kanelbulle", WORLD_W*0.05 - (1 - self.t)*WORLD_W*0.7, WORLD_H*0.45, WORLD_W*0.8, "center")
-    love.graphics.printf("Lick", WORLD_W*0.3 + (1 - self.t)*WORLD_W*0.7, WORLD_H*0.45, WORLD_W*0.8, "center")
+    love.graphics.printf("Slicka", WORLD_W*0.3 + (1 - self.t)*WORLD_W*0.7, WORLD_H*0.45, WORLD_W*0.8, "center")
   else
   	love.graphics.printf(TITLE, WORLD_W*0.1, WORLD_H*0.45, WORLD_W*0.8, "center")
   end
