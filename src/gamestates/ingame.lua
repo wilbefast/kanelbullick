@@ -48,36 +48,28 @@ function state:enter()
   body = love.physics.newBody(self.world, WORLD_W/2, WORLD_H)
   shape = love.physics.newRectangleShape(WORLD_W, 64)
   fixture = love.physics.newFixture(body, shape)
-  fixture:setCategory(COLLIDE_WALLS)
-  fixture:setMask(COLLIDE_WALLS)
   fixture:setRestitution(0.3)
   body:setUserData("southWall")
 	-- walls: north
   body = love.physics.newBody(self.world, WORLD_W/2, 0)
   shape = love.physics.newRectangleShape(WORLD_W, 64)
   fixture = love.physics.newFixture(body, shape)
-  fixture:setCategory(COLLIDE_WALLS)
-  fixture:setMask(COLLIDE_WALLS)
   fixture:setRestitution(0.3)
   body:setUserData("northWall")
 	-- walls: west
   body = love.physics.newBody(self.world, 0, WORLD_H/2)
-  shape = love.physics.newRectangleShape(64, WORLD_H)
+  shape = love.physics.newRectangleShape(128, WORLD_H)
   fixture = love.physics.newFixture(body, shape)
-  fixture:setCategory(COLLIDE_WALLS)
-  fixture:setMask(COLLIDE_WALLS)
   fixture:setRestitution(0.3)
   body:setUserData("westWall")
 	-- walls: east
   body = love.physics.newBody(self.world, WORLD_W, WORLD_H/2)
-  shape = love.physics.newRectangleShape(64, WORLD_H)
+  shape = love.physics.newRectangleShape(128, WORLD_H)
   fixture = love.physics.newFixture(body, shape)
- 	fixture:setCategory(COLLIDE_WALLS)
- 	fixture:setMask(COLLIDE_WALLS)
  	fixture:setRestitution(0.3)
   body:setUserData("eastWall")
   -- bun
-  self.bun = Bun(WORLD_W*0.5, -WORLD_H*0.5)
+  self.bun = Bun(WORLD_W*0.5, WORLD_H*0.5)
   self.lick = 0
 end
 
@@ -96,29 +88,30 @@ function state:keypressed(key, uni)
   end
 end
 
-function state:onWheelDown()
-  local dx, dy = mx - WORLD_W/2, my - WORLD_H
-  --self.bun.body:applyLinearImpulse(-dx*10, -dy*10)
+function state:doLick(dir)
+  if self.bun:isTouched(mx, my) then
+    local dx, dy = mx - WORLD_W/2, my - WORLD_H
+    self.bun.body:applyLinearImpulse(dir*dx*7, dir*dy*7)
 
-  self.lick = 0.1
+    self.lick = 0.1
+    for r = 0,6 do
+      local a = (r/6)*math.pi*2
+      local dx = math.cos(r)
+      local dy = math.sin(r)
+
+      dx = useful.lerp(dx, nm_angle_x, 0.5)*(100 + math.random()*30)
+      dy = useful.lerp(dy, nm_angle_y, 0.5)*(100 + math.random()*30)
+      Spittle(mx, my, dx, dy)
+    end
+  end
+end
+
+function state:onWheelDown()
+  self:doLick(1)
 end
 
 function state:onWheelUp()
-  local dx, dy = mx - WORLD_W/2, my - WORLD_H
-  --self.bun.body:applyLinearImpulse(dx*10, dy*10)
-
-  self.lick = 0.1
-  for r = 0,6 do
-    local a = (r/6)*math.pi*2
-    local dx = math.cos(r)
-    local dy = math.sin(r)
-
-    local nm_angle_x, nm_angle_y = Vector.normalise(m_angle_x, m_angle_y)
-
-    dx = useful.lerp(dx, nm_angle_x, 0.5)*(100 + math.random()*30)
-    dy = useful.lerp(dy, nm_angle_y, 0.5)*(100 + math.random()*30)
-    Spittle(mx, my, dx, dy)
-  end
+  self:doLick(-1)
 end
 
 function state:update(dt)
@@ -131,7 +124,10 @@ function state:update(dt)
   -- lick
   if self.lick > 0 then
     self.lick = self.lick - dt
-    self.bun:lick(mx - self.bun.x, my - self.bun.y, dt)
+    local side = (tongue_down and -1) or 1
+    for d = 0, 48, 16 do
+      self.bun:lick(mx + (side*d - 24)*nm_angle_x, my + (side*d - 24)*nm_angle_y, dt)
+    end
   end
 end
 

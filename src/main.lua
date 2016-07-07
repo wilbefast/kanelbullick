@@ -16,7 +16,7 @@ Lesser General Public License for more details.
 GLOBAL VARIABLES
 --]]------------------------------------------------------------
 
-TITLE = "Kanelbulle"
+TITLE = "Kanelbullick"
 WORLD_W, WORLD_H = 640, 640
 shake = 0
 COLLIDE_WALLS = 1
@@ -175,6 +175,7 @@ function love.update(dt)
   mx, my = scaling.scaleMouse()
   mx, my = useful.clamp(mx, 1, WORLD_W - 1), useful.clamp(my, 1, WORLD_H - 1)
   m_angle_x, m_angle_y = mx - WORLD_OX, my - WORLD_OY
+  nm_angle_x, nm_angle_y = Vector.normalise(m_angle_x, m_angle_y)
   m_angle = math.atan2(m_angle_y, m_angle_x) + math.pi/2
 end
 

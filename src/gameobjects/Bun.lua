@@ -18,6 +18,7 @@ Initialisation
 
 local SIZE = 400
 local HSIZE = SIZE/2
+local HSIZE2 = HSIZE*HSIZE
 
 local Bun = Class
 {
@@ -32,10 +33,8 @@ local Bun = Class
 		self.r = HSIZE
 		self.shape = love.physics.newCircleShape(self.r) 
 	  self.fixture = love.physics.newFixture(self.body, self.shape, 0.5)
-	 	self.fixture:setCategory(COLLIDE_WALLS)
-	 	self.fixture:setMask(COLLIDE_WALLS)
-	  self.fixture:setRestitution(0.6)
-	  self.fixture:setDensity(10)
+	  self.fixture:setRestitution(0.9)
+	  self.fixture:setDensity(1)
 
 	  self.cin = love.graphics.newCanvas(SIZE, SIZE)
 	  self.sugar = love.graphics.newCanvas(SIZE, SIZE)
@@ -66,8 +65,8 @@ Game loop
 
 function Bun:update(dt)
 	-- update to match physics
-	--self.x, self.y = self.body:getPosition()
-	self.y = useful.lerp(self.y, WORLD_H*0.5, dt)
+	self.x, self.y = self.body:getPosition()
+	--self.y = useful.lerp(self.y, WORLD_H*0.5, dt)
 	self.angle = self.body:getAngle()
 	self.angle_x = math.cos(self.angle)
 	self.angle_y = math.sin(self.angle)
@@ -88,7 +87,20 @@ function Bun:draw(x, y)
 	if DEBUG then
 		love.graphics.circle("line", self.x, self.y, self.r)
 		love.graphics.line(self.x, self.y, self.x + self.angle_x*self.r, self.y + self.angle_y*self.r)
+		love.graphics.push()
+			love.graphics.translate(self.x, self.y)
+			love.graphics.rotate(self.angle)
+			love.graphics.rectangle("line", -HSIZE, -HSIZE, SIZE, SIZE)
+		love.graphics.pop()
 	end
+end
+
+--[[------------------------------------------------------------
+Queries
+--]]--
+
+function Bun:amountCleaned()
+	return 0
 end
 
 --[[------------------------------------------------------------
@@ -96,29 +108,31 @@ Events
 --]]--
 
 function Bun:lick(x, y, dt)
-	x, y = x + HSIZE, y + HSIZE
-	if x < 0 or y < 0 or x > SIZE or y > SIZE then
+	if not self:isTouched(x, y) then
 		return
 	end
-
-	love.graphics.setBlendMode("replace")
-
-		love.graphics.setColor(0, 0, 0, 0)
-			love.graphics.setCanvas(self.cin)
-				for i = 1, math.ceil(4*dt) do
-					local r = 5 + math.random()*2
-					local x, y = x + useful.signedRand(5), y + useful.signedRand(5)
-					love.graphics.circle("fill", x, y, r)
-				end
-			love.graphics.setCanvas(self.sugar)
-				for i = 1, math.ceil(4*dt) do
-					local r = 15 + math.random()*10
-					local x, y = x + useful.signedRand(15), y + useful.signedRand(15)
-					love.graphics.circle("fill", x, y, r)
-				end
-			love.graphics.setCanvas(nil)
-
-	love.graphics.setBlendMode("alpha")
+	love.graphics.push()
+		love.graphics.translate(HSIZE, HSIZE)
+		x, y = x - self.x + HSIZE, y - self.y + HSIZE
+		love.graphics.rotate(-self.angle)
+		love.graphics.translate(-HSIZE, -HSIZE)
+		love.graphics.setBlendMode("replace")
+			love.graphics.setColor(0, 0, 0, 0)
+				love.graphics.setCanvas(self.cin)
+					for i = 1, math.ceil(4*dt) do
+						local r = 5 + math.random()*2
+						local x, y = x + useful.signedRand(5), y + useful.signedRand(5)
+						love.graphics.circle("fill", x, y, r)
+					end
+				love.graphics.setCanvas(self.sugar)
+					for i = 1, math.ceil(4*dt) do
+						local r = 15 + math.random()*10
+						local x, y = x + useful.signedRand(15), y + useful.signedRand(15)
+						love.graphics.circle("fill", x, y, r)
+					end
+				love.graphics.setCanvas(nil)
+		love.graphics.setBlendMode("alpha")
+	love.graphics.pop()
 
 end
 
