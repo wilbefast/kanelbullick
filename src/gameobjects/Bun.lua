@@ -103,6 +103,11 @@ function Bun:amountCleaned()
 	return 0
 end
 
+function Bun:isTouched(x, y)
+	return Vector.dist2(x, y, self.x, self.y) <= HSIZE2
+end
+
+
 --[[------------------------------------------------------------
 Events
 --]]--
