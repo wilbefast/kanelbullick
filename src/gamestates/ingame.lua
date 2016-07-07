@@ -154,7 +154,7 @@ function state:update(dt)
       self.bun:lick(mx + (side*d - 24)*nm_angle_x, my + (side*d - 24)*nm_angle_y, dt)
     end
 
-    -- check if the bun if licked
+    -- check if the bun is licked
     if self.bun:amountCleaned() >= 1 then
       self.bun:startDroppingOut()
       self.score = self.score + 1
@@ -188,7 +188,7 @@ function state:update(dt)
   if self.ui_t >= 1 and self.firstBlood then
     self.time_left = math.max(0, self.time_left - dt/60)
     if self.time_left <= 0 then
-      if self.bun then
+      if self.bun and not self.goToTitle then
         self.score = self.score + self.bun:amountCleaned()
       end
       self.goToTitle = true

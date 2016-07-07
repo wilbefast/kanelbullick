@@ -112,6 +112,9 @@ function love.load(arg)
   audio:load_music("na_sweden")
   audio:play_music("na_sweden")
 
+  -- sound
+  audio:load_sounds("lick", 11, 1, 2)
+
   -- highscore
   local s_highscore = love.filesystem.read("highscore.txt")
   if s_highscore then
@@ -120,7 +123,6 @@ function love.load(arg)
     highscore = 0
   end
 
-  -- sound
 
   -- initial gamestate
   GameState.switch(title)
@@ -170,6 +172,7 @@ function love.wheelmoved(x, y)
       tongue_up = true
       GameState.onWheelDown()
       shake = math.min(3, shake + 0.4)
+      audio:play_sound("lick")
     end 
   elseif y > 0 then
     if tongue_up then
@@ -177,6 +180,7 @@ function love.wheelmoved(x, y)
       tongue_up = false
       GameState.onWheelUp()
       shake = math.min(3, shake + 0.4)
+      audio:play_sound("lick")
     end
   end
 end
