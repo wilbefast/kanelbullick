@@ -155,7 +155,7 @@ function state:update(dt)
     end
 
     -- check if the bun is licked
-    if self.bun:amountCleaned() >= 1 then
+    if self.bun:amountCleaned() >= 1 and not self.bun.leaving then
       self.bun:startDroppingOut()
       self.score = self.score + 1
       self.firstBlood = false
