@@ -20,6 +20,8 @@ TITLE = "Kanelbullick"
 WORLD_W, WORLD_H = 640, 640
 shake = 0
 COLLIDE_WALLS = 1
+COLLIDE_FLOORS = 2
+COLLIDE_ROOFS = 3
 DEBUG = false
 WORLD_OX, WORLD_OY = WORLD_W/2, WORLD_H
 mx, my = WORLD_OX, WORLD_OY
@@ -104,9 +106,12 @@ function love.load(arg)
   love.graphics.setBackgroundColor(0, 0, 0)
 
   -- play music
+  audio:load_music("na_sweden")
+  audio:play_music("na_sweden")
 
   -- sound
 
+  -- initial gamestate
   GameState.switch(title)
 end
 
@@ -132,15 +137,15 @@ function love.keyreleased(key, uni)
 end
 
 function love.mousepressed(x, y, button)
-  if tongue_down then
-    tongue_down = false
-    tongue_up = true
-    GameState.onWheelDown()
-  else
-    tongue_down = true
-    tongue_up = false
-    GameState.onWheelUp()
-  end
+  -- if tongue_down then
+  --   tongue_down = false
+  --   tongue_up = true
+  --   GameState.onWheelDown()
+  -- else
+  --   tongue_down = true
+  --   tongue_up = false
+  --   GameState.onWheelUp()
+  -- end
 end
 
 function love.mousereleased(x, y, button)
@@ -149,16 +154,18 @@ end
 tongue_down, tongue_up = true, true
 function love.wheelmoved(x, y)
   if y < 0 then
-    tongue_down = false
-    if not tongue_up then
+    if tongue_down then
+      tongue_down = false
       tongue_up = true
       GameState.onWheelDown()
+      shake = math.min(3, shake + 0.4)
     end 
   elseif y > 0 then
-    tongue_up = false
-    if not tongue_down then
+    if tongue_up then
       tongue_down = true
+      tongue_up = false
       GameState.onWheelUp()
+      shake = math.min(3, shake + 0.4)
     end
   end
 end
@@ -173,20 +180,33 @@ function love.update(dt)
   end
 
   mx, my = scaling.scaleMouse()
-  mx, my = useful.clamp(mx, 1, WORLD_W - 1), useful.clamp(my, 1, WORLD_H - 1)
+  mx, my = useful.clamp(mx, 1, WORLD_W - 1), useful.clamp(my, 1, WORLD_H - 6*math.sqrt(math.abs(mx - WORLD_OX)))
   m_angle_x, m_angle_y = mx - WORLD_OX, my - WORLD_OY
   nm_angle_x, nm_angle_y = Vector.normalise(m_angle_x, m_angle_y)
   m_angle = math.atan2(m_angle_y, m_angle_x) + math.pi/2
+
+  babysitter.update(dt)
 end
 
 function love.draw()
   useful.pushCanvas(WORLD_CANVAS)
     -- clear
-    love.graphics.setColor(91, 132, 192)
+    if (title.entering or title.leaving) and title.t < 0 then
+      local t = 1 + 2*title.t
+      love.graphics.setColor(91*t, 132*t, 192*t)
+    else
+      love.graphics.setColor(91, 132, 192)
+    end
     love.graphics.rectangle("fill", 0, 0, WORLD_W, WORLD_H)
     love.graphics.setColor(224, 216, 73)
-    love.graphics.rectangle("fill", 0, WORLD_H*0.4, WORLD_W, WORLD_H*0.2)
-    love.graphics.rectangle("fill", WORLD_W*0.4, 0, WORLD_W*0.2, WORLD_H)
+    if title.entering or title.leaving then
+      local t = math.max(0, title.t)
+      love.graphics.rectangle("fill", 0, WORLD_H*0.5 - WORLD_H*0.1*t, WORLD_W, WORLD_H*0.2*t)
+      love.graphics.rectangle("fill", WORLD_W*0.5 - WORLD_H*0.1*t, 0, WORLD_W*0.2*t, WORLD_H)
+    else
+      love.graphics.rectangle("fill", 0, WORLD_H*0.4, WORLD_W, WORLD_H*0.2)
+      love.graphics.rectangle("fill", WORLD_W*0.4, 0, WORLD_W*0.2, WORLD_H)
+    end
     useful.bindWhite()
     -- draw any other state specific stuff
     GameState.draw()
