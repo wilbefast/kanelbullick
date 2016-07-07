@@ -39,7 +39,7 @@ local Bun = Class
 	  self.fixture = love.physics.newFixture(self.body, self.shape, 0.5)
 		self.fixture:setFriction(0.7)
 	  self.fixture:setRestitution(0.4)
-	  self.fixture:setDensity(1)
+	  self.fixture:setDensity(0.1)
 
 	  self.cin = love.graphics.newCanvas(SIZE, SIZE)
 	  self.sugar = love.graphics.newCanvas(SIZE, SIZE)
@@ -126,7 +126,10 @@ function Bun:startDroppingOut()
     end
     audio:set_music_volume(1)
   end))
+end
 
+function Bun:push(x, y, dx, dy)
+	self.body:applyLinearImpulse(dx, dy, x, y)
 end
 
 --[[------------------------------------------------------------
@@ -164,7 +167,7 @@ function Bun:update(dt)
 
 	-- drop in
   if self.entering then
-    self.body:applyLinearImpulse(0, dt*4000)
+    self.body:applyForce(0, dt*80000)
 		if self.y > WORLD_H*0.5 then
 			self:endDroppingIn()
 		end
@@ -172,7 +175,7 @@ function Bun:update(dt)
 
 	-- drop out
   if self.leaving then
-    self.body:applyLinearImpulse(0, dt*4000)
+    self.body:applyForce(0, dt*80000)
 		if self.y > WORLD_H + SIZE + 8 then
 			self.purge = true
 		end

@@ -85,6 +85,7 @@ function love.load(arg)
   img_tongue = love.graphics.newImage("assets/png/tongue.png")
   img_tongue_up = love.graphics.newImage("assets/png/tongue_up.png")
   img_tongue_down = love.graphics.newImage("assets/png/tongue_down.png")
+  img_helmut = love.graphics.newImage("assets/png/helmut.png")
 
   -- initialise random
   math.randomseed(os.time())

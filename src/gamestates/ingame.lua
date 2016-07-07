@@ -116,8 +116,8 @@ function state:doLick(dir)
     self.firstBlood = true
     shake = math.min(3, shake + 0.6)
     local dx, dy = mx - WORLD_W/2, my - WORLD_H
-    self.bun.body:applyLinearImpulse(dir*dx*17, dir*dy*17)
-
+    self.bun:push(mx, my, dir*dx*14, dir*dy*14)
+    
     self.lick = 0.1
     for r = 0,6 do
       local a = (r/6)*math.pi*2
@@ -224,6 +224,8 @@ function state:draw()
   elseif tongue_down then
     love.graphics.draw(img_tongue_down, mx, my, m_angle, 1, 1, 100, 25)
   end
+  love.graphics.draw(img_helmut, mx, my, m_angle, 1, 1, 400, -300)
+  
 
   -- ui
   if self.bun then

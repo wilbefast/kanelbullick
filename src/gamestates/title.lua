@@ -130,6 +130,7 @@ function state:draw()
   elseif tongue_down then
     love.graphics.draw(img_tongue_down, mx, my, m_angle, 1, 1, 100, 25)
   end
+  love.graphics.draw(img_helmut, mx, my, m_angle, 1, 1, 400, -300)
 end
 
 
