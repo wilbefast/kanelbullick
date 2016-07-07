@@ -112,6 +112,14 @@ function love.load(arg)
   audio:load_music("na_sweden")
   audio:play_music("na_sweden")
 
+  -- highscore
+  local s_highscore = love.filesystem.read("highscore.txt")
+  if s_highscore then
+    highscore = tonumber(s_highscore)
+  else
+    highscore = 0
+  end
+
   -- sound
 
   -- initial gamestate

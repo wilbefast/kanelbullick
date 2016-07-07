@@ -191,7 +191,6 @@ function Bun:draw(x, y)
 	love.graphics.draw(self.cin, self.x, self.y, self.angle, 1, 1, HSIZE, HSIZE)
 	love.graphics.draw(self.sugar, self.x, self.y, self.angle, 1, 1, HSIZE, HSIZE)
 
-
 	if DEBUG then
 		love.graphics.circle("line", self.x, self.y, self.r)
 		love.graphics.line(self.x, self.y, self.x + self.angle_x*self.r, self.y + self.angle_y*self.r)

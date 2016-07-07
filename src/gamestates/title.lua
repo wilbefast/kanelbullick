@@ -45,13 +45,17 @@ Callbacks
 
 function state:keypressed(key, uni)
   if key == "escape" then
-  	self.leaving = true
+    if not self.entering and not self.leaving then
+    	self.leaving = true
+      shake = shake + 2
+    end
   end
 end
 
 function state:enterGame()
   if not self.leaving and not self.entering then
     self.toGame = true
+    shake = shake + 2
   end
 end
 
@@ -99,6 +103,19 @@ function state:draw()
 	love.graphics.setFont(fontMedium)
 	love.graphics.printf("@wilbefast", -(1 - self.t)*WORLD_W*0.4, WORLD_H*0.75, WORLD_W*0.4, "center")
 	love.graphics.printf("#CGJ2016", (1 - self.t)*WORLD_W*0.4 + WORLD_W*0.6, WORLD_H*0.75, WORLD_W*0.4, "center")
+
+  -- last score
+  if ingame.score and ingame.score > 0 then
+    love.graphics.printf("You licked " .. tostring(math.floor(ingame.score * 100)/100) .. " bullar!", 
+      -(1 - self.t)*WORLD_W*0.4, WORLD_H*0.2, WORLD_W*0.4, "center")
+  end
+
+  -- highscore
+  if highscore > 0 then
+    love.graphics.printf("Highscore " .. tostring(math.floor(highscore * 100)/100) .. " bullar", 
+      (1 - self.t)*WORLD_W*0.4 + WORLD_W*0.6, WORLD_H*0.2, WORLD_W*0.4, "center")
+  end
+
   useful.bindWhite()
 
   -- tongue

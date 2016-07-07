@@ -35,6 +35,7 @@ GameState navigation
 --]]--
 
 function state:init()
+  self.score = 0
 end
 
 function state:enter()
@@ -88,6 +89,10 @@ end
 function state:leave()
 	GameObject.purgeAll()
   self.world:destroy()
+  if self.score > highscore then
+    highscore = self.score
+    love.filesystem.write("highscore.txt", tostring(highscore))
+  end
 end
 
 --[[------------------------------------------------------------
@@ -96,7 +101,11 @@ Callbacks
 
 function state:keypressed(key, uni)
   if key == "escape" then
-    self.goToTitle = true
+    if not self.goToTitle then
+      self.goToTitle = true
+      self.score = 0
+      shake = shake + 2
+    end
   end
 end
 
@@ -178,6 +187,12 @@ function state:update(dt)
   -- update time limit
   if self.ui_t >= 1 and self.firstBlood then
     self.time_left = math.max(0, self.time_left - dt/60)
+    if self.time_left <= 0 then
+      if self.bun then
+        self.score = self.score + self.bun:amountCleaned()
+      end
+      self.goToTitle = true
+    end
   end
 end
 
@@ -221,7 +236,7 @@ function state:draw()
     love.graphics.rectangle("line", 16 - 48*(1 - self.ui_t), 16, 32, max_h)
     if self.tutorial then
       love.graphics.setColor(110, 72, 75)
-      love.graphics.printf("Kanelmeter", 64, 48*self.ui_t - 32, WORLD_W*0.4, "left")
+      love.graphics.printf("< Cinnameter", 64, 48*self.ui_t - 32, WORLD_W*0.4, "left")
     end
     -- timer
     love.graphics.setColor(145, 183, 180)
@@ -232,7 +247,7 @@ function state:draw()
     love.graphics.rectangle("line", WORLD_W - 48*self.ui_t, 16, 32, max_h)
     if self.tutorial then
       love.graphics.setColor(145, 183, 180)
-      love.graphics.printf("Slickatimer", WORLD_W - 64 - WORLD_W*0.4, 48*self.ui_t - 32, WORLD_W*0.4, "right")
+      love.graphics.printf("Time Left >", WORLD_W - 64 - WORLD_W*0.4, 48*self.ui_t - 32, WORLD_W*0.4, "right")
     end
     useful.bindWhite()
   end
